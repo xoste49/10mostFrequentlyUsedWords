@@ -17,6 +17,9 @@ namespace _10mostFrequentlyUsedWords
       public MainForm()
       {
          InitializeComponent();
+         // Считываем последний используемый путь
+         if(!string.IsNullOrWhiteSpace(Properties.Settings.Default.LastPath))
+            folderBrowserDialog.SelectedPath = Properties.Settings.Default.LastPath;
       }
 
       private ConcurrentDictionary<string, int> dict = new ConcurrentDictionary<string, int>();
@@ -26,6 +29,9 @@ namespace _10mostFrequentlyUsedWords
          // Открываем диалог выбора папки
          if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
          {
+            // Записываем путь к папке в настройки
+            Properties.Settings.Default.LastPath = folderBrowserDialog.SelectedPath;
+            Properties.Settings.Default.Save();
             string[] files = Directory.GetFiles(folderBrowserDialog.SelectedPath);
             foreach (string fileName in files)
             {
