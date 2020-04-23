@@ -24,10 +24,24 @@ namespace _10mostFrequentlyUsedWords
          if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
          {
             string[] files = Directory.GetFiles(folderBrowserDialog.SelectedPath);
-            string s;
             foreach (string fileName in files)
-               s = fileName;
+            {
+               // Считываем из файла 
+               try
+               {
+                  using (var sr = new StreamReader(fileName))
+                  {
+                     sr.ReadToEnd();
+                  }
+               }
+               catch (Exception exception)
+               {
+                  MessageBox.Show(exception.Message);
+               }
+            }
          }
+
+         
       }
    }
 }
