@@ -31,6 +31,7 @@
          this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
          this.bOpenDirectory = new System.Windows.Forms.Button();
          this.tbTopList = new System.Windows.Forms.TextBox();
+         this.listBox1 = new System.Windows.Forms.ListBox();
          this.SuspendLayout();
          // 
          // folderBrowserDialog
@@ -52,14 +53,24 @@
          this.tbTopList.Location = new System.Drawing.Point(12, 57);
          this.tbTopList.Multiline = true;
          this.tbTopList.Name = "tbTopList";
+         this.tbTopList.ReadOnly = true;
          this.tbTopList.Size = new System.Drawing.Size(378, 381);
          this.tbTopList.TabIndex = 1;
+         // 
+         // listBox1
+         // 
+         this.listBox1.FormattingEnabled = true;
+         this.listBox1.Location = new System.Drawing.Point(397, 57);
+         this.listBox1.Name = "listBox1";
+         this.listBox1.Size = new System.Drawing.Size(290, 381);
+         this.listBox1.TabIndex = 2;
          // 
          // MainForm
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.ClientSize = new System.Drawing.Size(800, 450);
+         this.Controls.Add(this.listBox1);
          this.Controls.Add(this.tbTopList);
          this.Controls.Add(this.bOpenDirectory);
          this.Name = "MainForm";
@@ -74,6 +85,7 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.Button bOpenDirectory;
       private System.Windows.Forms.TextBox tbTopList;
+      private System.Windows.Forms.ListBox listBox1;
    }
 }
 
