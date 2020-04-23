@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -18,6 +19,8 @@ namespace _10mostFrequentlyUsedWords
          InitializeComponent();
       }
 
+      private ConcurrentDictionary<string, int> dict = new ConcurrentDictionary<string, int>();
+
       private void bOpenDirectory_Click(object sender, EventArgs e)
       {
          // Открываем диалог выбора папки
@@ -26,12 +29,27 @@ namespace _10mostFrequentlyUsedWords
             string[] files = Directory.GetFiles(folderBrowserDialog.SelectedPath);
             foreach (string fileName in files)
             {
-               // Считываем из файла 
+               // Считываем из файла
                try
                {
                   using (var sr = new StreamReader(fileName))
                   {
-                     sr.ReadToEnd();
+                     while (sr.Peek() >= 0)
+                     {
+                        var s = sr.ReadLine();
+                        try
+                        {
+                           dict.TryUpdate(s, ++dict[s], dict[s]);
+                        }
+                        catch (System.Collections.Generic.KeyNotFoundException exception)
+                        {
+                           dict.TryAdd(s, 1);
+                        }
+                        catch (Exception exception)
+                        {
+                           MessageBox.Show(exception.Message);
+                        }
+                     }
                   }
                }
                catch (Exception exception)
@@ -39,9 +57,11 @@ namespace _10mostFrequentlyUsedWords
                   MessageBox.Show(exception.Message);
                }
             }
+
+            MessageBox.Show("Готово");
          }
 
-         
+
       }
    }
 }
