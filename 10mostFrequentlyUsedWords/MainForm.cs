@@ -64,6 +64,11 @@ namespace _10mostFrequentlyUsedWords
                }
             }
 
+            // сортируем
+            var sortdict = dict.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            foreach (var item in sortdict)
+               tbTopList.Text += item.Key + " " + item.Value + Environment.NewLine;
+
             MessageBox.Show("Готово");
          }
 
