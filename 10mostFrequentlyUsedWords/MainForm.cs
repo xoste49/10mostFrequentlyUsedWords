@@ -128,11 +128,10 @@ namespace _10mostFrequentlyUsedWords
             Invoke(new MethodInvoker(() => { lbWords.Items.Clear(); }));
             ConcurrentDictionary<string, int> sortDictionary = new ConcurrentDictionary<string, int>(dict); // Копируем из-за проблем с доступностью
             var sortDict = sortDictionary.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
-            foreach (var item in sortDict)
+            for (int i = 0; i < countPrint; i++)
             {
-               Invoke(new MethodInvoker(() => { tbWords.Text += item.Key + " " + item.Value + Environment.NewLine; }));
-               Invoke(new MethodInvoker(() => { lbWords.Items.Add(item.Key + " " + item.Value); }));
-               if (lbWords.Items.Count == countPrint) break;
+               Invoke(new MethodInvoker(() => { tbWords.Text += sortDict.Keys.ElementAt(i) + " " + sortDict.Values.ElementAt(i) + Environment.NewLine; }));
+               Invoke(new MethodInvoker(() => { lbWords.Items.Add(sortDict.Keys.ElementAt(i) + " " + sortDict.Values.ElementAt(i)); }));
             }
          }
 
@@ -183,8 +182,8 @@ namespace _10mostFrequentlyUsedWords
          stopWatch.Stop();
          Invoke(new MethodInvoker(() => { MessageBox.Show("Готово! RunTime " + elapsedTime); }));
          // Включение элементов интерфейса
-         Invoke(new MethodInvoker(() => { bOpenDirectory.Enabled = false; }));
-         Invoke(new MethodInvoker(() => { nMinLength.Enabled = false; }));
+         Invoke(new MethodInvoker(() => { bOpenDirectory.Enabled = true; }));
+         Invoke(new MethodInvoker(() => { nMinLength.Enabled = true; }));
       }
    }
 }
