@@ -41,11 +41,17 @@ namespace _10mostFrequentlyUsedWords
             // Записываем путь к папке в настройки
             Properties.Settings.Default.LastPath = folderBrowserDialog.SelectedPath;
             Properties.Settings.Default.Save();
-            string[] files = Directory.GetFiles(folderBrowserDialog.SelectedPath);
-            // Проверка на пустую папку
-            if (files.Length == 0)
+            // Проверка пустой папки
+            if (Directory.GetFiles(folderBrowserDialog.SelectedPath).Length == 0)
             {
                MessageBox.Show("Папка пуста!");
+               return;
+            }
+            string[] files = Directory.GetFiles(folderBrowserDialog.SelectedPath, "*.txt");
+            // Проверка на присутствие txt файлов
+            if (files.Length == 0)
+            {
+               MessageBox.Show("txt файлы отсутствуют!");
                return;
             }
             foreach (string fileName in files)
