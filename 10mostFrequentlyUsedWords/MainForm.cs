@@ -122,17 +122,20 @@ namespace _10mostFrequentlyUsedWords
          bool IsStop = false;
          while (!IsStop)
          {
-            Thread.Sleep(300);
+            Thread.Sleep(500);
             if (!ReadFilesThread.IsAlive) IsStop = true;
-            Invoke(new MethodInvoker(() => { tbWords.Text = ""; }));
-            Invoke(new MethodInvoker(() => { lbWords.Items.Clear(); }));
             ConcurrentDictionary<string, int> sortDictionary = new ConcurrentDictionary<string, int>(dict); // Копируем из-за проблем с доступностью
             var sortDict = sortDictionary.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            string tb = "";
+            string[] lb = new string[countPrint];
             for (int i = 0; i < countPrint; i++)
             {
-               Invoke(new MethodInvoker(() => { tbWords.Text += sortDict.Keys.ElementAt(i) + " " + sortDict.Values.ElementAt(i) + Environment.NewLine; }));
-               Invoke(new MethodInvoker(() => { lbWords.Items.Add(sortDict.Keys.ElementAt(i) + " " + sortDict.Values.ElementAt(i)); }));
+               tb += sortDict.Keys.ElementAt(i) + " " + sortDict.Values.ElementAt(i) + Environment.NewLine;
+               lb[i] = sortDict.Keys.ElementAt(i) + " " + sortDict.Values.ElementAt(i);
             }
+
+            Invoke(new MethodInvoker(() => { tbWords.Text = tb; }));
+            Invoke(new MethodInvoker(() => { lbWords.Items.Clear(); lbWords.Items.AddRange(lb);}));
          }
 
          endWork();
