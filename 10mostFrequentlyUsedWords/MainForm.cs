@@ -46,16 +46,9 @@ namespace _10mostFrequentlyUsedWords
             Properties.Settings.Default.Save();
             if (IsCheckEmptyFolder(folderBrowserDialog.SelectedPath)) return;
             if (IsCheckTxtFiles(folderBrowserDialog.SelectedPath)) return;
-            
 
-            // сортируем
-            var sortdict = dict.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
-            foreach (var item in sortdict)
-            {
-               tbTopList.Text += item.Key + " " + item.Value + Environment.NewLine;
-               listBox1.Items.Add(item.Key + " " + item.Value);
-               if (listBox1.Items.Count == countPrint) break;
-            }
+            ReadFiles();
+            SortDictionary();
 
             MessageBox.Show("Готово!");
          }
@@ -98,6 +91,18 @@ namespace _10mostFrequentlyUsedWords
             {
                MessageBox.Show(exception.Message);
             }
+         }
+      }
+
+      // Сортировка словаря
+      private void SortDictionary()
+      {
+         var sortdict = dict.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+         foreach (var item in sortdict)
+         {
+            tbTopList.Text += item.Key + " " + item.Value + Environment.NewLine;
+            listBox1.Items.Add(item.Key + " " + item.Value);
+            if (listBox1.Items.Count == countPrint) break;
          }
       }
 
