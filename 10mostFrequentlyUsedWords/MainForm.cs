@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -22,10 +23,16 @@ namespace _10mostFrequentlyUsedWords
             folderBrowserDialog.SelectedPath = Properties.Settings.Default.LastPath;
       }
 
+      // Словарь (слово => кол-во)
       private ConcurrentDictionary<string, int> dict = new ConcurrentDictionary<string, int>();
+      // Колличество выводимых слов
+      private int countPrint = 10;
 
+      // Кнопка выбора папки
       private void bOpenDirectory_Click(object sender, EventArgs e)
       {
+         // Регулярное выражение минимальной длины слова
+         Regex regex = new Regex(@"^.{" + (int)nMinLength.Value + ",}$");
          // Открываем диалог выбора папки
          if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
          {
@@ -43,6 +50,10 @@ namespace _10mostFrequentlyUsedWords
                      while (sr.Peek() >= 0)
                      {
                         var s = sr.ReadLine();
+                        // Проверяем на пустую строку
+                        if(string.IsNullOrWhiteSpace(s)) continue;
+                        // Проверяем минимальную длину строки
+                        if (!regex.IsMatch(s)) continue;
                         try
                         {
                            dict.TryUpdate(s, ++dict[s], dict[s]);
@@ -64,9 +75,6 @@ namespace _10mostFrequentlyUsedWords
                }
             }
 
-            // Колличество выводимых слов
-            int countPrint = 10;
-
             // сортируем
             var sortdict = dict.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
             foreach (var item in sortdict)
@@ -77,7 +85,7 @@ namespace _10mostFrequentlyUsedWords
             }
                
 
-            MessageBox.Show("Готово");
+            MessageBox.Show("Готово!");
          }
 
 
