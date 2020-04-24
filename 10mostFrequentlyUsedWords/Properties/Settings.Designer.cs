@@ -34,5 +34,17 @@ namespace _10mostFrequentlyUsedWords.Properties {
                 this["LastPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MinLength {
+            get {
+                return ((int)(this["MinLength"]));
+            }
+            set {
+                this["MinLength"] = value;
+            }
+        }
     }
 }

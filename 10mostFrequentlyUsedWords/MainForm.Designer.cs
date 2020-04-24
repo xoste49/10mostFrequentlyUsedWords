@@ -79,6 +79,7 @@
             0,
             0,
             0});
+         this.nMinLength.ValueChanged += new System.EventHandler(this.nMinLength_ValueChanged);
          // 
          // lMinLength
          // 

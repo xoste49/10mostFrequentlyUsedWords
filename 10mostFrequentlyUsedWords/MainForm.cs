@@ -21,6 +21,8 @@ namespace _10mostFrequentlyUsedWords
          // Считываем последний используемый путь
          if(!string.IsNullOrWhiteSpace(Properties.Settings.Default.LastPath))
             folderBrowserDialog.SelectedPath = Properties.Settings.Default.LastPath;
+         // Считываем последнее значение длины слова
+         if (Properties.Settings.Default.MinLength != null) nMinLength.Value = Properties.Settings.Default.MinLength;
       }
 
       // Словарь (слово => кол-во)
@@ -83,12 +85,16 @@ namespace _10mostFrequentlyUsedWords
                listBox1.Items.Add(item.Key + " " + item.Value);
                if(listBox1.Items.Count == countPrint) break;
             }
-               
 
             MessageBox.Show("Готово!");
          }
+      }
 
-
+      private void nMinLength_ValueChanged(object sender, EventArgs e)
+      {
+         // Записываем изменения длины слова в настройки
+         Properties.Settings.Default.MinLength = (int) nMinLength.Value;
+         Properties.Settings.Default.Save();
       }
    }
 }
