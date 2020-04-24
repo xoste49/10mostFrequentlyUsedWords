@@ -32,21 +32,26 @@ namespace _10mostFrequentlyUsedWords
       // Словарь (слово => кол-во)
       private static ConcurrentDictionary<string, int> dict = new ConcurrentDictionary<string, int>();
       // Колличество выводимых слов
-      private int countPrint = 10;
+      private static int countPrint = 10;
       // Регулярное выражение минимальной длины слова
       private static Regex regex;
       // Поток для чтения файлов
       Thread ReadFilesThread = new Thread(new ParameterizedThreadStart(ReadFiles));
+      // Поток для сортировки
+      Thread SortDictionaryThread;
+      // Время работы
+      Stopwatch stopWatch = new Stopwatch();
 
       // 52.10 секунд в одном потоке
       // 34.29 секунд с отдельным потоком чтения файлов
+      // 32 секунды с отдельным потоком чтения файлов и сортировки
       // Кнопка выбора папки
       private void bOpenDirectory_Click(object sender, EventArgs e)
       {
+         SortDictionaryThread = new Thread(SortDictionary);
          // Открываем диалог выбора папки
          if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
          {
-            Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             // Записываем путь к папке в настройки
             Properties.Settings.Default.LastPath = folderBrowserDialog.SelectedPath;
@@ -54,21 +59,9 @@ namespace _10mostFrequentlyUsedWords
             if (IsCheckEmptyFolder(folderBrowserDialog.SelectedPath)) return;
             if (IsCheckTxtFiles(folderBrowserDialog.SelectedPath)) return;
 
-            //ReadFiles(folderBrowserDialog.SelectedPath);
             ReadFilesThread.Start(folderBrowserDialog.SelectedPath);
-            while (ReadFilesThread.IsAlive)
-            {
-               SortDictionary();
-               Thread.Sleep(300);
-            }
-            SortDictionary();
-            TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-               ts.Hours, ts.Minutes, ts.Seconds,
-               ts.Milliseconds / 10);
+            SortDictionaryThread.Start();
 
-            stopWatch.Stop();
-            MessageBox.Show("Готово! RunTime " + elapsedTime);
          }
       }
 
@@ -116,16 +109,25 @@ namespace _10mostFrequentlyUsedWords
       // Сортировка словаря
       private void SortDictionary()
       {
-         tbWords.Text = "";
-         lbWords.Items.Clear();
-         ConcurrentDictionary<string, int> sortDictionary = new ConcurrentDictionary<string, int>(dict); // Копируем из-за проблем с доступностью
-         var sortDict = sortDictionary.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
-         foreach (var item in sortDict)
+         // Флаг остановки потока чтения файлов
+         bool IsStop = false;
+         while (!IsStop)
          {
-            tbWords.Text += item.Key + " " + item.Value + Environment.NewLine;
-            lbWords.Items.Add(item.Key + " " + item.Value);
-            if (lbWords.Items.Count == countPrint) break;
+            Thread.Sleep(300);
+            if (!ReadFilesThread.IsAlive) IsStop = true;
+            Invoke(new MethodInvoker(() => { tbWords.Text = ""; }));
+            Invoke(new MethodInvoker(() => { lbWords.Items.Clear(); }));
+            ConcurrentDictionary<string, int> sortDictionary = new ConcurrentDictionary<string, int>(dict); // Копируем из-за проблем с доступностью
+            var sortDict = sortDictionary.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            foreach (var item in sortDict)
+            {
+               Invoke(new MethodInvoker(() => { tbWords.Text += item.Key + " " + item.Value + Environment.NewLine; }));
+               Invoke(new MethodInvoker(() => { lbWords.Items.Add(item.Key + " " + item.Value); }));
+               if (lbWords.Items.Count == countPrint) break;
+            }
          }
+
+         endWork();
       }
 
       // Проверка пустой папки
@@ -159,6 +161,18 @@ namespace _10mostFrequentlyUsedWords
          Properties.Settings.Default.Save();
          // Регулярное выражение минимальной длины слова
          regex = new Regex(@"^.{" + (int)nMinLength.Value + ",}$");
+      }
+
+      // Метод вызова окончания работы потоков
+      private void endWork()
+      {
+         TimeSpan ts = stopWatch.Elapsed;
+         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+
+         stopWatch.Stop();
+         Invoke(new MethodInvoker(() => { MessageBox.Show("Готово! RunTime " + elapsedTime); }));
       }
    }
 }
