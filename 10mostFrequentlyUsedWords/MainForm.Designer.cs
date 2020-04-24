@@ -113,7 +113,7 @@
          this.Controls.Add(this.bOpenDirectory);
          this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
          this.Name = "MainForm";
-         this.Text = "Form1";
+         this.Text = "10-ти самых часто используемых слов";
          ((System.ComponentModel.ISupportInitialize)(this.nMinLength)).EndInit();
          this.ResumeLayout(false);
          this.PerformLayout();
