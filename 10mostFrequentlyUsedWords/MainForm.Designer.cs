@@ -96,6 +96,7 @@
          this.tbWords.Location = new System.Drawing.Point(222, 79);
          this.tbWords.Multiline = true;
          this.tbWords.Name = "tbWords";
+         this.tbWords.ReadOnly = true;
          this.tbWords.Size = new System.Drawing.Size(204, 186);
          this.tbWords.TabIndex = 6;
          // 

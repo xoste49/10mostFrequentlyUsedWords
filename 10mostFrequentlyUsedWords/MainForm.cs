@@ -48,6 +48,9 @@ namespace _10mostFrequentlyUsedWords
       // Кнопка выбора папки
       private void bOpenDirectory_Click(object sender, EventArgs e)
       {
+         // Выключение элементов интерфейса
+         bOpenDirectory.Enabled = false;
+         nMinLength.Enabled = false;
          SortDictionaryThread = new Thread(SortDictionary);
          // Открываем диалог выбора папки
          if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
@@ -62,6 +65,12 @@ namespace _10mostFrequentlyUsedWords
             ReadFilesThread.Start(folderBrowserDialog.SelectedPath);
             SortDictionaryThread.Start();
 
+         }
+         else
+         {
+            // Включение элементов интерфейса в случае отмены выбора папки
+            bOpenDirectory.Enabled = true;
+            nMinLength.Enabled = true;
          }
       }
 
@@ -173,6 +182,9 @@ namespace _10mostFrequentlyUsedWords
 
          stopWatch.Stop();
          Invoke(new MethodInvoker(() => { MessageBox.Show("Готово! RunTime " + elapsedTime); }));
+         // Включение элементов интерфейса
+         Invoke(new MethodInvoker(() => { bOpenDirectory.Enabled = false; }));
+         Invoke(new MethodInvoker(() => { nMinLength.Enabled = false; }));
       }
    }
 }
