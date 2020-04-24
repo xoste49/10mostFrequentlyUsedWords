@@ -22,7 +22,7 @@ namespace _10mostFrequentlyUsedWords
          if(!string.IsNullOrWhiteSpace(Properties.Settings.Default.LastPath))
             folderBrowserDialog.SelectedPath = Properties.Settings.Default.LastPath;
          // Считываем последнее значение длины слова
-         if (Properties.Settings.Default.MinLength != null) nMinLength.Value = Properties.Settings.Default.MinLength;
+         nMinLength.Value = Properties.Settings.Default.MinLength;
       }
 
       // Словарь (слово => кол-во)
@@ -42,6 +42,12 @@ namespace _10mostFrequentlyUsedWords
             Properties.Settings.Default.LastPath = folderBrowserDialog.SelectedPath;
             Properties.Settings.Default.Save();
             string[] files = Directory.GetFiles(folderBrowserDialog.SelectedPath);
+            // Проверка на пустую папку
+            if (files.Length == 0)
+            {
+               MessageBox.Show("Папка пуста!");
+               return;
+            }
             foreach (string fileName in files)
             {
                // Считываем из файла
