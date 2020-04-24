@@ -3,11 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -28,36 +30,53 @@ namespace _10mostFrequentlyUsedWords
       }
 
       // Словарь (слово => кол-во)
-      private ConcurrentDictionary<string, int> dict = new ConcurrentDictionary<string, int>();
+      private static ConcurrentDictionary<string, int> dict = new ConcurrentDictionary<string, int>();
       // Колличество выводимых слов
       private int countPrint = 10;
       // Регулярное выражение минимальной длины слова
-      private Regex regex;
+      private static Regex regex;
+      // Поток для чтения файлов
+      Thread ReadFilesThread = new Thread(new ParameterizedThreadStart(ReadFiles));
 
+      // 52.10 секунд в одном потоке
+      // 34.29 секунд с отдельным потоком чтения файлов
       // Кнопка выбора папки
       private void bOpenDirectory_Click(object sender, EventArgs e)
       {
-         
          // Открываем диалог выбора папки
          if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
          {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             // Записываем путь к папке в настройки
             Properties.Settings.Default.LastPath = folderBrowserDialog.SelectedPath;
             Properties.Settings.Default.Save();
             if (IsCheckEmptyFolder(folderBrowserDialog.SelectedPath)) return;
             if (IsCheckTxtFiles(folderBrowserDialog.SelectedPath)) return;
 
-            ReadFiles();
+            //ReadFiles(folderBrowserDialog.SelectedPath);
+            ReadFilesThread.Start(folderBrowserDialog.SelectedPath);
+            while (ReadFilesThread.IsAlive)
+            {
+               SortDictionary();
+               Thread.Sleep(300);
+            }
             SortDictionary();
+            TimeSpan ts = stopWatch.Elapsed;
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+               ts.Hours, ts.Minutes, ts.Seconds,
+               ts.Milliseconds / 10);
 
-            MessageBox.Show("Готово!");
+            stopWatch.Stop();
+            MessageBox.Show("Готово! RunTime " + elapsedTime);
          }
       }
 
       // Чтение файлов
-      private void ReadFiles()
+      private static void ReadFiles(object x)
       {
-         string[] files = Directory.GetFiles(folderBrowserDialog.SelectedPath, "*.txt");
+         string path = (string) x;
+         string[] files = Directory.GetFiles(path, "*.txt");
          foreach (string fileName in files)
          {
             // Считываем из файла
@@ -97,12 +116,15 @@ namespace _10mostFrequentlyUsedWords
       // Сортировка словаря
       private void SortDictionary()
       {
-         var sortdict = dict.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
-         foreach (var item in sortdict)
+         tbWords.Text = "";
+         lbWords.Items.Clear();
+         ConcurrentDictionary<string, int> sortDictionary = new ConcurrentDictionary<string, int>(dict); // Копируем из-за проблем с доступностью
+         var sortDict = sortDictionary.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+         foreach (var item in sortDict)
          {
-            tbTopList.Text += item.Key + " " + item.Value + Environment.NewLine;
-            listBox1.Items.Add(item.Key + " " + item.Value);
-            if (listBox1.Items.Count == countPrint) break;
+            tbWords.Text += item.Key + " " + item.Value + Environment.NewLine;
+            lbWords.Items.Add(item.Key + " " + item.Value);
+            if (lbWords.Items.Count == countPrint) break;
          }
       }
 
